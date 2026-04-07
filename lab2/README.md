@@ -17,6 +17,7 @@
 Результат:
 
 ![Alt text](image-2.png)
+
 Ссылки на используемые материалы:
 https://habr.com/ru/companies/otus/articles/529356/
 
