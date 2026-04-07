@@ -3,7 +3,6 @@ def f1(s):
     c=0
     for i in itertools.product("КАТЕР", repeat=6):
         if i[0]=="Р" and i[-1]=="К":
-            print(i)
             c+=1
     print(f"Всего {c} слов")
 def f2(ch):
