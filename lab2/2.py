@@ -3,7 +3,6 @@ def f1(s):
     c=0
     for i in itertools.product("КАТЕР", repeat=6):
         if i[0]=="Р" and i[-1]=="К":
-            print(i)
             c+=1
     print(f"Всего {c} слов")
 def f2(ch):
@@ -19,7 +18,7 @@ def f2(ch):
             c+=1
     print(c)
 def f3():
-    for i in range(123450000,10**9+1):
+    for i in range(123450000,10**9):
         s = str(i)
         if s[0:5]=="12345" and s[6]=="7" and s[8]=="8" and i%23==0:
             print(f"{i} | {i//23}")
