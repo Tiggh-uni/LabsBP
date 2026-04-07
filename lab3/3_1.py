@@ -17,16 +17,16 @@ def fr(k):
     print("Рекурсия")
     print(f"a={a(k)}")
     print(f"b={b(k)}")
-def a(k):
-    if k<=1:
-        return 1
-    else:
-        return 2*b(k-1)+a(k-1)
-def b(k):
-    if k<=1:
-        return 1
-    else:
-        return 2*a(k-1)+b(k-1)
+    def a(k):
+        if k<=1:
+            return 1
+        else:
+            return 2*b(k-1)+a(k-1)
+    def b(k):
+        if k<=1:
+            return 1
+        else:
+            return 2*a(k-1)+b(k-1)
 def fnr(k):
     print("Не рекурсия")
     a=1
