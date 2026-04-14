@@ -80,6 +80,6 @@ def test_fnr_values(capsys):
         assert a_val == ea
         assert b_val == eb
 
-# Проверка, что fnr не падает на больших k (нет рекурсии)
+# Проверка, что fnr не падает на больших k 
 def test_fnr_large_k():
     fnr(1000)  # не должно вызвать RecursionError
