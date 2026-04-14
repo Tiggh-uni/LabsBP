@@ -1,4 +1,5 @@
 import itertools
+import functools
 
 def lr(l):
     if not l:
@@ -20,13 +21,14 @@ def lnr(l):
     l.clear()
     l.extend(result)
     return l
-
 def fr(k):
     print("Рекурсия")
+    @functools.lru_cache()
     def a(k):
         if k <= 1:
             return 1
         return 2 * b(k-1) + a(k-1)
+    @functools.lru_cache()
     def b(k):
         if k <= 1:
             return 1
