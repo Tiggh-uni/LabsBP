@@ -24,6 +24,7 @@
 ![Alt text](image-2.png)
 
 Ссылки на используемые материалы:
+
 https://habr.com/ru/companies/otus/articles/529356/
 
 https://proglib.io/p/iteriruemsya-pravilno-20-priemov-ispolzovaniya-v-python-modulya-itertools-2020-01-03
