@@ -1,6 +1,5 @@
 import itertools
-import doctest
-doctest.testmod()
+
 def f1(s):
     """
     Подсчитывает количество 6-буквенных слов из букв "КАТЕР",
@@ -72,3 +71,6 @@ print("№2")
 f2(216**6+216**4+36**6-6**14-24)
 print("№3")
 f3()
+if __name__ =="__main__":
+    import doctest
+    doctest.testmod()
