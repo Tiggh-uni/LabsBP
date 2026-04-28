@@ -12,9 +12,9 @@
 
 Список используемых источников:
 
-https://proglib.io/p/samouchitel-po-python-dlya-nachinayushchih-chast-13-rekursivnye-funkcii-2023-01-23
+[Самоучитель по Python для начинающих. Часть 13: Рекурсивные функции](https://proglib.io/p/samouchitel-po-python-dlya-nachinayushchih-chast-13-rekursivnye-funkcii-2023-01-23)
 
-https://habr.com/ru/articles/337030/
+[Как работает рекурсия – объяснение в блок-схемах и видео](https://habr.com/ru/articles/337030/)
 
-https://pytest.org/
+[pytest: helps you write better programs](https://pytest.org/)
 
