@@ -47,7 +47,7 @@ def significant_changes(
     for _, new_value in filtered:
         yield new_value
 
-
+print()
 # ------------------- Тесты pytest -------------------
 
 def test_numbers_significant_change():
