@@ -55,5 +55,8 @@ summa(1,34,432,543,324,124,"hp")
  Список использованных источников:
 
  [Замыкания и декораторы в Python: часть 1 — замыкания](https://habr.com/ru/articles/781866/)
+ 
  [Замыкания и Декораторы](https://pyhub.ru/python-advanced/lecture-10-33-71/)
+ 
  [Декораторы Python: пошаговое руководство](https://habr.com/ru/companies/otus/articles/727590/)
+ 
