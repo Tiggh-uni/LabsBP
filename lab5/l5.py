@@ -44,7 +44,7 @@ def significant_changes(
 
     for _, new_value in filtered:
         yield new_value
-
+print(list(significant_changes([10.0], lambda x: x + 1e-5, 1)))
 # ------------------- Тесты pytest -------------------
 
 def test_numbers_significant_change():
