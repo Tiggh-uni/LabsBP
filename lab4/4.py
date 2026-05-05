@@ -18,19 +18,23 @@ def check(types= None, mi_v = None, ma_v=None):
             return func(*args, **kwargs)
         return wraper
     return chec_d
-@check(types = (int, float),mi_v=0, ma_v=600)
+#@check(types = (int, float),mi_v=0, ma_v=600)
 def summa(*args):
+    h = []
     def wraper(*args):
-        s=0
-        k=0
-        for i in  args:
-            s+=i
-            k+=1
-        print(f'Среднее арефмитическое параметров: {s/k}\n Сумма чисел:{su}')
+        if args:
+            h.extend(args)
+            sc = su
+            sh = sum(h)
+        
+        print(f'Среднее арефмитическое параметров: {sh/len(h)}\n Сумма чисел:{sc}')
 
-    su=0
-    for i in args:
-        su+=i
-    return  wraper(*args)
+    su=sum(args)
+    print(su)
+    return  wraper
 summa(1,34,432,543,324,124)
-summa(1,34,432,543,324,124,"hp")
+#summa(1,34,432,543,324,124,"hp")
+
+a = summa()
+a(7,8,8)
+a(5,3,65,43)
