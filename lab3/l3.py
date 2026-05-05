@@ -33,6 +33,9 @@ def fr(k):
         if k <= 1:
             return 1
         return 2 * a(k-1) + b(k-1)
+    for i in range(k):
+        a(i)
+        b(i)
     print(f"a={a(k)}")
     print(f"b={b(k)}")
 

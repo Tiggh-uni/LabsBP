@@ -5,7 +5,7 @@
 ![Alt text](image.png)
 
 Цель: Значение выражения 
-216^6+216^4+36^6−6^14−24 записали в системе счисления с основанием 6. Сколько различных цифр содержит эта запись?
+$216^6+216^4+36^6−6^{14}−24$ записали в системе счисления с основанием 6. Сколько различных цифр содержит эта запись?
 
 Результат:
 
@@ -25,8 +25,8 @@
 
 Ссылки на используемые материалы:
 
-https://habr.com/ru/companies/otus/articles/529356/
+[Itertools в Python](https://habr.com/ru/companies/otus/articles/529356/)
 
-https://proglib.io/p/iteriruemsya-pravilno-20-priemov-ispolzovaniya-v-python-modulya-itertools-2020-01-03
+[Итерируем правильно: 20 приемов использования в Python модуля itertools](https://proglib.io/p/iteriruemsya-pravilno-20-priemov-ispolzovaniya-v-python-modulya-itertools-2020-01-03)
 
-https://www.geeksforgeeks.org/python/python-itertools/
+[Python Itertools](https://www.geeksforgeeks.org/python/python-itertools/)
