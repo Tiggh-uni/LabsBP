@@ -1,7 +1,6 @@
 from functools import wraps
 def check(types= None, mi_v = None, ma_v=None):
     def chec_d(func: callable)-> callable:
-        @wraps(func)
         def wraper(*args,**kwargs):
             if types is not None:
                 for arg in args:
@@ -30,12 +29,9 @@ def summa(*args):
         
         print(f'Среднее арефмитическое параметров: {sh/len(h)}\n Сумма чисел:{sc}')
 
-    su=sum(args)
-    if args:
-        print(su)
     return  wraper
 summa(1,34,432,543,324,124)
-#summa(1,34,432,543,324,124,"hp")
+summa(1,34,432,543,324,124,"hp")
 
 a = summa()
 a(7,8,8)
