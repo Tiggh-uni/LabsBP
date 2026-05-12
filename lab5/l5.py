@@ -18,10 +18,9 @@ def sig_changes(
     sign_func: функция, определяющая значительность изменения.
                               Принимает (old_value, new_value, n) и возвращает bool.
                               Если не задана, используется встроенная логика для чисел и строк.
-    :yield: изменённые элементы, прошедшие фильтр значительности
     """
     if sign_func is None:
-        def significance_func(old: Any, new: Any, n: int) -> bool:
+        def sign_func(old: Any, new: Any, n: int) -> bool:
             
             if isinstance(old, (int, float)):
                 
@@ -34,25 +33,26 @@ def sig_changes(
                 return new != old
 
    
-    def apply_n_times(x: Any) -> Any:
+    def a_n_t(x: Any) -> Any:
         return reduce(lambda val, _: func(val), range(n), x)
 
     
-    mapped = map(lambda x: (x, apply_n_times(x)), iterable)
+    mapped = map(lambda x: (x, a_n_t(x)), iterable)
 
-    filtered = filter(lambda pair: significance_func(pair[0], pair[1], n), mapped)
+    filtered = filter(lambda pair: sign_func(pair[0], pair[1], n), mapped)
 
     for _, new_value in filtered:
         yield new_value
 print(list(sig_changes([10.0], lambda x: x + 1e-5, 1)))
+print(list(sig_changes([1, 2, 3],lambda x: x*1.4,5,lambda old, new, _: new - old > 10)))
 # ------------------- Тесты pytest -------------------
 
 def test_numbers_significant_change():
     
     result = list(sig_changes(
         [1, 2, 3],
-        1,
         lambda x: x + 1,
+        1,
         lambda old, new, _: new - old > 0.5
     ))
     assert result == [2, 3, 4]
@@ -127,7 +127,7 @@ def test_generator_lazyness():
         for i in range(5):
             yield i
 
-    result_gen = significant_changes(gen(), lambda x: x + 1, 1, lambda o, n, _: n - o > 0)
+    result_gen = sig_changes(gen(), lambda x: x + 1, 1, lambda o, n, _: n - o > 0)
     
     assert next(result_gen) == 1
     assert next(result_gen) == 2
