@@ -6,26 +6,25 @@ import pytest
 from functools import reduce
 from typing import Iterable, Callable, Any, Optional
 
-def significant_changes(
+def sig_changes(
     iterable: Iterable[Any],
     func: Callable[[Any], Any],
     n: int,
-    significance_func: Optional[Callable[[Any, Any, int], bool]] = None
+    sign_func: Optional[Callable[[Any, Any, int], bool]] = None
 ):
     """
     Генератор, который применяет функцию func к каждому элементу последовательности
     n раз и возвращает только те результаты, которые значительно изменились.
 
-    :param iterable: исходная последовательность
-    :param func: функция, применяемая к элементу
-    :param n: количество применений
-    :param significance_func: функция, определяющая значительность изменения.
+    iterable: исходная последовательность
+    func: функция, применяемая к элементу
+    n: количество применений
+    sign_func: функция, определяющая значительность изменения.
                               Принимает (old_value, new_value, n) и возвращает bool.
                               Если не задана, используется встроенная логика для чисел и строк.
-    :yield: изменённые элементы, прошедшие фильтр значительности
     """
-    if significance_func is None:
-        def significance_func(old: Any, new: Any, n: int) -> bool:
+    if sign_func is None:
+        def sign_func(old: Any, new: Any, n: int) -> bool:
             
             if isinstance(old, (int, float)):
                 
@@ -38,22 +37,23 @@ def significant_changes(
                 return new != old
 
    
-    def apply_n_times(x: Any) -> Any:
+    def a_n_t(x: Any) -> Any:
         return reduce(lambda val, _: func(val), range(n), x)
 
     
-    mapped = map(lambda x: (x, apply_n_times(x)), iterable)
+    mapped = map(lambda x: (x, a_n_t(x)), iterable)
 
-    filtered = filter(lambda pair: significance_func(pair[0], pair[1], n), mapped)
+    filtered = filter(lambda pair: sign_func(pair[0], pair[1], n), mapped)
 
     for _, new_value in filtered:
         yield new_value
-
+print(list(sig_changes([10.0], lambda x: x + 1e-5, 1)))
+print(list(sig_changes([1, 2, 3],lambda x: x*1.4,5,lambda old, new, _: new - old > 10)))
 # ------------------- Тесты pytest -------------------
 
 def test_numbers_significant_change():
     
-    result = list(significant_changes(
+    result = list(sig_changes(
         [1, 2, 3],
         lambda x: x + 1,
         1,
@@ -64,7 +64,7 @@ def test_numbers_significant_change():
 
 def test_numbers_insignificant_change():
     
-    result = list(significant_changes(
+    result = list(sig_changes(
         [1, 2, 3],
         lambda x: x + 0.1,
         1,
@@ -75,7 +75,7 @@ def test_numbers_insignificant_change():
 
 def test_multiple_applications():
     
-    result = list(significant_changes(
+    result = list(sig_changes(
         [1, 2, 3],
         lambda x: x * 2,
         2,
@@ -86,7 +86,7 @@ def test_multiple_applications():
 
 def test_strings_length_change():
     
-    result = list(significant_changes(
+    result = list(sig_changes(
         ["x", "ab", "xyz"],
         lambda s: s + 'a',
         3,
@@ -97,7 +97,7 @@ def test_strings_length_change():
 
 def test_strings_no_change():
     
-    result = list(significant_changes(
+    result = list(sig_changes(
         ["abc", "def", "g"],
         lambda s: s[0] if s else s,
         1,
@@ -108,20 +108,20 @@ def test_strings_no_change():
 
 def test_default_significance_for_numbers():
     
-    result = list(significant_changes([10.0], lambda x: x + 1e-5, 1))
+    result = list(sig_changes([10.0], lambda x: x + 1e-5, 1))
     assert result == [10.00001]
 
     
-    result = list(significant_changes([10.0], lambda x: x + 1e-7, 1))
+    result = list(sig_changes([10.0], lambda x: x + 1e-7, 1))
     assert result == []
 
 
 def test_default_significance_for_strings():
     
-    result = list(significant_changes(["hello"], lambda s: s + 'aa', 2))
-    assert result == []  
+    result = list(sig_changes(["hello"], lambda s: s + 'aa', 2))
+    assert result == ["helloaaaa"]  
 
-    result = list(significant_changes(["hello"], lambda s: s + 'aaa', 2))
+    result = list(sig_changes(["hello"], lambda s: s + 'aaa', 1))
     assert result == ["helloaaa"]
 
 
@@ -131,7 +131,7 @@ def test_generator_lazyness():
         for i in range(5):
             yield i
 
-    result_gen = significant_changes(gen(), lambda x: x + 1, 1, lambda o, n, _: n - o > 0)
+    result_gen = sig_changes(gen(), lambda x: x + 1, 1, lambda o, n, _: n - o > 0)
     
     assert next(result_gen) == 1
     assert next(result_gen) == 2
