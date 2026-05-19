@@ -16,7 +16,6 @@ from kivy.uix.popup import Popup
 from kivy.uix.filechooser import FileChooserListView
 from kivy.core.window import Window
 
-# Установка размера окна для удобства
 Window.size = (600, 700)
 
 
@@ -355,7 +354,6 @@ class RecipeAppLayout(BoxLayout):
     """Основной layout приложения на Kivy"""
     
     def __init__(self, calculator: RecipeCalculator, db_repo: SQLiteRepository, **kwargs):
-        # Устанавливаем атрибуты ДО вызова super()
         self.calculator = calculator
         self.db_repo = db_repo
         self.current_result: Optional[RecipeResult] = None
@@ -364,10 +362,10 @@ class RecipeAppLayout(BoxLayout):
             'doc': WordExporter()
         }
         
-        # Теперь вызываем super()
+        
         super().__init__(**kwargs)
         
-        # Настраиваем layout
+        
         self.orientation = 'vertical'
         self.padding = 10
         self.spacing = 10
@@ -377,7 +375,6 @@ class RecipeAppLayout(BoxLayout):
     def _build_ui(self):
         """Построение интерфейса"""
         
-        # Заголовок
         title = Label(
             text="[size=24][b]Калькулятор рецептов[/b][/size]",
             markup=True,
@@ -385,7 +382,6 @@ class RecipeAppLayout(BoxLayout):
         )
         self.add_widget(title)
         
-        # Выбор рецепта
         self.add_widget(Label(text="Выберите блюдо:", size_hint_y=0.05))
         self.recipe_spinner = Spinner(
             text="Выберите рецепт",
@@ -394,7 +390,6 @@ class RecipeAppLayout(BoxLayout):
         )
         self.add_widget(self.recipe_spinner)
         
-        # Кнопка расчёта
         self.calc_btn = Button(
             text="Рассчитать",
             size_hint_y=0.08,
@@ -403,20 +398,22 @@ class RecipeAppLayout(BoxLayout):
         self.calc_btn.bind(on_press=self._calculate)
         self.add_widget(self.calc_btn)
         
-        # Область вывода результата (ScrollView)
         scroll = ScrollView(size_hint_y=0.5)
         self.result_label = Label(
             text="[i]Результат появится здесь...[/i]",
             markup=True,
             size_hint_y=None,
             halign='left',
-            valign='top'
+            valign='top',
+            font_size= '14sp'
         )
-        self.result_label.bind(size=self.result_label.setter('text_size'))
+        self.result_label.bind(
+            width = lambda *x: self.result_label.setter('text_size')(self.result_label, (self.result_label.width, None)),
+            texture_size= lambda *x: self.result_label.setter('height')(self.result_label, self.result_label.texture_size[1])
+        )
         scroll.add_widget(self.result_label)
         self.add_widget(scroll)
         
-        # Кнопки экспорта
         btn_layout = BoxLayout(orientation='horizontal', size_hint_y=0.08, spacing=10)
         
         self.xls_btn = Button(text="Сохранить в XLS")
@@ -429,9 +426,8 @@ class RecipeAppLayout(BoxLayout):
         
         self.add_widget(btn_layout)
         
-        # Кнопка сохранения в БД
         self.db_btn = Button(
-            text="💾 Сохранить в базу данных",
+            text=" Сохранить в базу данных",
             size_hint_y=0.08,
             background_color=(0.3, 0.7, 0.3, 1)
         )
@@ -463,7 +459,6 @@ class RecipeAppLayout(BoxLayout):
             self._show_popup("Нет данных", "Сначала выполните расчёт")
             return
         
-        # Создаём popup с выбором файла
         content = BoxLayout(orientation='vertical')
         filechooser = FileChooserListView()
         content.add_widget(filechooser)
@@ -576,14 +571,11 @@ def create_default_recipes(calculator: RecipeCalculator):
 
 # ========== ТОЧКА ВХОДА ==========
 if __name__ == "__main__":
-    # Создание ингредиентов и рецептов
     ingredients = create_default_ingredients()
     calculator = RecipeCalculator(ingredients)
     create_default_recipes(calculator)
     
-    # Инициализация БД (SQLite)
     db_repo = SQLiteRepository("recipes.db")
     
-    # Запуск Kivy приложения
     app = RecipeApp(calculator, db_repo)
     app.run()

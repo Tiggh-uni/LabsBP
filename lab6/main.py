@@ -1,53 +1,52 @@
-# main.py
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from recipe.calculator import RECIPES, calculate
 from recipe.report import save_to_xls, save_to_doc
-import psycopg2
+#import psycopg2
 
 # ---------- Настройки БД (PostgreSQL в Docker) ----------
-DB_CONFIG = {
-    "dbname": "recipes_db",
-    "user": "postgres",
-    "password": "postgres",
-    "host": "localhost",
-    "port": 5432
-}
+#DB_CONFIG = {
+    #"dbname": "recipes_db",
+    #"user": "postgres",
+    #"password": "postgres",
+    #"host": "localhost",
+    #"port": 5432
+#}
 
-def save_to_db(results):
-    try:
-        conn = psycopg2.connect(**DB_CONFIG)
-        cur = conn.cursor()
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS results (
-                id SERIAL PRIMARY KEY,
-                recipe TEXT,
-                kcal REAL,
-                protein REAL,
-                fat REAL,
-                carbs REAL,
-                price REAL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-        cur.execute("""
-            INSERT INTO results (recipe, kcal, protein, fat, carbs, price)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (
-            results["recipe"],
-            results["kcal"],
-            results["protein"],
-            results["fat"],
-            results["carbs"],
-            results["price"]
-        ))
-        conn.commit()
-        cur.close()
-        conn.close()
-        return True
-    except Exception as e:
-        messagebox.showerror("Ошибка БД", str(e))
-        return False
+#def save_to_db(results):
+    #try:
+        #conn = psycopg2.connect(**DB_CONFIG)
+        #cur = conn.cursor()
+        #cur.execute("""
+            #CREATE TABLE IF NOT EXISTS results (
+                #id SERIAL PRIMARY KEY,
+                #recipe TEXT,
+                #kcal REAL,
+                #protein REAL,
+                #fat REAL,
+                #carbs REAL,
+                #price REAL,
+                #created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            #)
+        #""")
+        #cur.execute("""
+            #INSERT INTO results (recipe, kcal, protein, fat, carbs, price)
+            #VALUES (%s, %s, %s, %s, %s, %s)
+        #""", (
+            #results["recipe"],
+            #results["kcal"],
+            #results["protein"],
+            #results["fat"],
+            #results["carbs"],
+            #results["price"]
+        #))
+        #conn.commit()
+        #cur.close()
+        #conn.close()
+        #return True
+    #except Exception as e:
+        #messagebox.showerror("Ошибка БД", str(e))
+        #return False
 
 # ---------- Графический интерфейс ----------
 class RecipeApp:
@@ -56,25 +55,25 @@ class RecipeApp:
         self.root.title("Расчёт рецептов")
         self.current_result = None
 
-        # Выбор рецепта
+        
         ttk.Label(root, text="Выберите блюдо:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.recipe_var = tk.StringVar()
         self.recipe_combo = ttk.Combobox(root, textvariable=self.recipe_var,
                                          values=list(RECIPES.keys()), state="readonly")
         self.recipe_combo.grid(row=0, column=1, padx=5, pady=5)
 
-        # Кнопка расчёта
+        
         ttk.Button(root, text="Рассчитать", command=self.calculate).grid(row=1, column=0, columnspan=2, pady=10)
 
-        # Текстовое поле для вывода результата
+        
         self.result_text = tk.Text(root, height=12, width=55, state="disabled")
         self.result_text.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
-        # Кнопки экспорта
+        
         ttk.Button(root, text="Сохранить в XLS", command=self.export_xls).grid(row=3, column=0, padx=5, pady=5, sticky="ew")
         ttk.Button(root, text="Сохранить в DOC", command=self.export_doc).grid(row=3, column=1, padx=5, pady=5, sticky="ew")
 
-        # Сохранение в БД
+        
         ttk.Button(root, text="Сохранить в БД", command=self.save_db).grid(row=4, column=0, columnspan=2, pady=5, sticky="ew")
 
     def calculate(self):
@@ -83,7 +82,7 @@ class RecipeApp:
             messagebox.showwarning("Внимание", "Выберите блюдо из списка")
             return
         try:
-            # Здесь можно было бы добавить окно для изменения количеств, но пока используем стандартные
+            
             self.current_result = calculate(recipe)
             self.display_result()
         except Exception as e:

@@ -149,3 +149,12 @@ if __name__ == "__main__":
 
 Результат:
 
+![Alt text](image.png)
+
+Список литературы:
+
+[Python модули и пакеты](https://habr.com/ru/articles/718828/)
+
+[Модули в Python](https://python-academy.org/ru/guide/modules)
+
+[Модули и пакеты Python: структурирование кода для разработчиков](https://sky.pro/wiki/python/moduli-i-pakety-v-python-import-i-organizaciya-koda/)
