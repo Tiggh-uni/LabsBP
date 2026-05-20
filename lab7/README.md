@@ -601,5 +601,7 @@ if __name__ == "__main__":
 Список источников:
 
 [ООП. Да что же ты такое?](https://habr.com/ru/articles/902634/)
+
 [ООП: четыре принципа разработки эффективного и чистого кода](https://sky.pro/wiki/java/chetyre-stolpa-oop-inkapsulyaciya-nasledovanie-polimorfizm-abstrakciya/)
+
 [Полиморфизм в Python](https://habr.com/ru/articles/552922/)
