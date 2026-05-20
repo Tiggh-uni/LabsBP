@@ -405,16 +405,19 @@ class RecipeAppLayout(BoxLayout):
         
         # Область вывода результата (ScrollView)
         scroll = ScrollView(size_hint_y=0.5)
-        self.result_label = Label(
-            text="[i]Результат появится здесь...[/i]",
-            markup=True,
-            size_hint_y=None,
-            halign='left',
-            valign='top'
-        )
-        self.result_label.bind(size=self.result_label.setter('text_size'))
-        scroll.add_widget(self.result_label)
-        self.add_widget(scroll)
+self.result_label = Label(
+    text="[i]Результат появится здесь...[/i]",
+    markup=True,
+    size_hint_y=None,            # авто-высота
+    halign='left',
+    valign='top',
+    font_size='14sp'
+)
+self.result_label.bind(
+    width=lambda *x: self.result_label.setter('text_size')(self.result_label, (self.result_label.width, None)),
+    texture_size=lambda *x: self.result_label.setter('height')(self.result_label, self.result_label.texture_size[1])
+)
+scroll.add_widget(self.result_label)
         
         # Кнопки экспорта
         btn_layout = BoxLayout(orientation='horizontal', size_hint_y=0.08, spacing=10)
