@@ -1,4 +1,4 @@
-# ========== main.py (KIVY VERSION - ИСПРАВЛЕННЫЙ) ==========
+# ========== main.py (KIVY VERSION - БЕЗ ИСТОРИИ) ==========
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -14,18 +14,16 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.popup import Popup
 from kivy.uix.filechooser import FileChooserListView
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
 
-# Установка размера окна
-Window.size = (650, 750)
-Window.clearcolor = (0.95, 0.95, 0.95, 1)  # Светлый фон
+# Установка размера окна для удобства
+Window.size = (600, 700)
 
 
 # ========== Value Object ==========
 @dataclass
 class NutritionalValue:
+    """Value object для пищевой ценности"""
     kcal: float
     protein: float
     fat: float
@@ -53,6 +51,8 @@ class NutritionalValue:
 
 # ========== Ingredient Classes ==========
 class Ingredient:
+    """Класс ингредиента с managed-атрибутами"""
+    
     def __init__(self, name: str, protein: float, fat: float, 
                  carbs: float, kcal: float, price_per_100g: float):
         self._name = name
@@ -97,6 +97,8 @@ class Ingredient:
 
 
 class IngredientPortion:
+    """Порция ингредиента в рецепте"""
+    
     def __init__(self, ingredient: Ingredient, grams: float, 
                  nutritional_value: NutritionalValue, price: float):
         self.ingredient = ingredient
@@ -112,6 +114,8 @@ class IngredientPortion:
 
 
 class RecipeResult:
+    """Результат расчёта рецепта"""
+    
     def __init__(self, name: str, portions: List[IngredientPortion]):
         self.name = name
         self.portions = portions
@@ -145,21 +149,20 @@ class RecipeResult:
     def __str__(self) -> str:
         lines = [f"Блюдо: {self.name}",
                  f"Калории: {self.total_nutrition.kcal:.1f} ккал",
-                 f"Белки: {self.total_nutrition.protein:.1f} г",
-                 f"Жиры: {self.total_nutrition.fat:.1f} г",
-                 f"Углеводы: {self.total_nutrition.carbs:.1f} г",
+                 f"Белки/Жиры/Углеводы: {self.total_nutrition.protein:.1f}/{self.total_nutrition.fat:.1f}/{self.total_nutrition.carbs:.1f} г",
                  f"Стоимость: {self.total_price:.2f} руб."]
         return "\n".join(lines)
     
     def to_text(self) -> str:
+        """Форматированный вывод для GUI"""
         text = f"[b]{self.name}[/b]\n\n"
-        text += f"Энергетическая ценность:\n"
+        text += f"📊 Энергетическая ценность:\n"
         text += f"   Калории: {self.total_nutrition.kcal:.1f} ккал\n"
         text += f"   Белки: {self.total_nutrition.protein:.1f} г\n"
         text += f"   Жиры: {self.total_nutrition.fat:.1f} г\n"
         text += f"   Углеводы: {self.total_nutrition.carbs:.1f} г\n\n"
-        text += f"Стоимость: {self.total_price:.2f} руб.\n\n"
-        text += f"Состав:\n"
+        text += f"💰 Стоимость: {self.total_price:.2f} руб.\n\n"
+        text += f"📋 Состав:\n"
         for ing, (grams, kcal, price) in self.breakdown.items():
             text += f"   • {ing}: {grams} г, {kcal:.1f} ккал, {price:.2f} руб.\n"
         return text
@@ -167,17 +170,14 @@ class RecipeResult:
 
 # ========== Calculator ==========
 class RecipeCalculator:
+    """Калькулятор рецептов"""
+    
     def __init__(self, ingredients_db: Dict[str, Ingredient]):
         self._ingredients = ingredients_db
         self._recipes: Dict[str, Dict[str, float]] = {}
     
     def add_recipe(self, name: str, ingredients: Dict[str, float]):
         self._recipes[name] = ingredients
-    
-    def get_recipe_ingredients(self, recipe_name: str) -> Dict[str, float]:
-        if recipe_name not in self._recipes:
-            return {}
-        return self._recipes[recipe_name].copy()
     
     def calculate(self, recipe_name: str, custom_weights: Optional[Dict[str, float]] = None) -> RecipeResult:
         if recipe_name not in self._recipes:
@@ -208,6 +208,7 @@ class RecipeCalculator:
 
 # ========== Database Repository ==========
 class DatabaseRepository(ABC):
+    
     @abstractmethod
     def save_result(self, result: RecipeResult) -> bool:
         pass
@@ -218,6 +219,8 @@ class DatabaseRepository(ABC):
 
 
 class SQLiteRepository(DatabaseRepository):
+    """Реализация для SQLite"""
+    
     def __init__(self, db_path: str = "recipes.db"):
         self.db_path = db_path
         self._init_table()
@@ -279,14 +282,17 @@ class SQLiteRepository(DatabaseRepository):
 
 # ========== Exporters ==========
 class ReportExporter(ABC):
+    
     @abstractmethod
     def export(self, result: RecipeResult, filepath: str) -> None:
         pass
 
 
 class ExcelExporter(ReportExporter):
+    
     def export(self, result: RecipeResult, filepath: str) -> None:
         wb = openpyxl.Workbook()
+        
         ws = wb.active
         ws.title = "Результаты"
         ws.append(["Рецепт", "Ккал", "Белки", "Жиры", "Углеводы", "Стоимость (руб)"])
@@ -298,10 +304,12 @@ class ExcelExporter(ReportExporter):
             result.total_nutrition.carbs,
             result.total_price
         ])
+        
         ws2 = wb.create_sheet("Ингредиенты")
         ws2.append(["Ингредиент", "Грамм", "Ккал", "Цена (руб)"])
         for ing, (grams, kcal, price) in result.breakdown.items():
             ws2.append([ing, grams, kcal, price])
+        
         wb.save(filepath)
     
     def __str__(self) -> str:
@@ -312,11 +320,13 @@ class ExcelExporter(ReportExporter):
 
 
 class WordExporter(ReportExporter):
+    
     def export(self, result: RecipeResult, filepath: str) -> None:
         doc = Document()
         doc.add_heading('Отчёт по рецепту', level=1)
         doc.add_paragraph(f'Блюдо: {result.name}')
         doc.add_paragraph(f'Энергетическая ценность: {result.total_nutrition.kcal} ккал')
+        
         p = doc.add_paragraph()
         p.add_run('Белки: ').bold = True
         p.add_run(f'{result.total_nutrition.protein} г, ')
@@ -324,10 +334,13 @@ class WordExporter(ReportExporter):
         p.add_run(f'{result.total_nutrition.fat} г, ')
         p.add_run('Углеводы: ').bold = True
         p.add_run(f'{result.total_nutrition.carbs} г')
+        
         doc.add_paragraph(f'Стоимость: {result.total_price} руб.')
         doc.add_heading('Состав:', level=2)
+        
         for ing, (grams, kcal, price) in result.breakdown.items():
             doc.add_paragraph(f'{ing}: {grams} г, {kcal:.1f} ккал, {price:.2f} руб.')
+        
         doc.save(filepath)
     
     def __len__(self) -> int:
@@ -337,261 +350,132 @@ class WordExporter(ReportExporter):
         self.export(result, filepath)
 
 
-# ========== Окно редактирования ингредиентов ==========
-class EditIngredientsPopup(Popup):
-    def __init__(self, recipe_name: str, ingredients: Dict[str, float], callback, **kwargs):
-        super().__init__(**kwargs)
-        self.title = f"Изменить количество: {recipe_name}"
-        self.size_hint = (0.85, 0.7)
-        self.auto_dismiss = False  # Не закрывать по клику вне окна
-        self.recipe_name = recipe_name
-        self.original_ingredients = ingredients.copy()
-        self.callback = callback
-        self.inputs = {}
-        
-        self._build_ui()
-    
-    def _build_ui(self):
-        main_layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
-        
-        # Заголовок
-        info_label = Label(
-            text="Измените количество ингредиентов (в граммах):",
-            size_hint_y=0.08,
-            bold=True
-        )
-        main_layout.add_widget(info_label)
-        
-        # Область с полями ввода
-        scroll = ScrollView(size_hint_y=0.75)
-        grid = GridLayout(cols=2, spacing=10, size_hint_y=None)
-        grid.bind(minimum_height=grid.setter('height'))
-        
-        for ing_name, default_grams in self.original_ingredients.items():
-            ing_label = Label(
-                text=f"{ing_name}:",
-                halign='right',
-                size_hint_x=0.4,
-                font_size='14sp'
-            )
-            grid.add_widget(ing_label)
-            
-            input_field = TextInput(
-                text=str(int(default_grams)) if default_grams == int(default_grams) else str(default_grams),
-                input_filter='float',
-                multiline=False,
-                size_hint_x=0.6,
-                font_size='14sp'
-            )
-            grid.add_widget(input_field)
-            self.inputs[ing_name] = input_field
-        
-        scroll.add_widget(grid)
-        main_layout.add_widget(scroll)
-        
-        # Кнопки
-        btn_layout = BoxLayout(size_hint_y=0.12, spacing=10)
-        
-        cancel_btn = Button(text="Отмена", background_color=(0.8, 0.3, 0.3, 1))
-        cancel_btn.bind(on_press=self._on_cancel)
-        btn_layout.add_widget(cancel_btn)
-        
-        ok_btn = Button(text="Рассчитать", background_color=(0.2, 0.7, 0.2, 1))
-        ok_btn.bind(on_press=self._on_ok)
-        btn_layout.add_widget(ok_btn)
-        
-        main_layout.add_widget(btn_layout)
-        self.add_widget(main_layout)
-    
-    def _on_ok(self, instance):
-        custom_weights = {}
-        for ing_name, input_field in self.inputs.items():
-            try:
-                value = float(input_field.text)
-                if value < 0:
-                    value = 0
-                custom_weights[ing_name] = value
-            except ValueError:
-                custom_weights[ing_name] = self.original_ingredients[ing_name]
-        
-        # Закрываем окно и вызываем callback
-        self.dismiss()
-        if self.callback:
-            self.callback(custom_weights)
-    
-    def _on_cancel(self, instance):
-        self.dismiss()
-
-
 # ========== Kivy GUI ==========
 class RecipeAppLayout(BoxLayout):
+    """Основной layout приложения на Kivy"""
+    
     def __init__(self, calculator: RecipeCalculator, db_repo: SQLiteRepository, **kwargs):
+        # Устанавливаем атрибуты ДО вызова super()
         self.calculator = calculator
         self.db_repo = db_repo
         self.current_result: Optional[RecipeResult] = None
-        self.current_recipe: Optional[str] = None
         self.exporters = {
             'xls': ExcelExporter(),
             'doc': WordExporter()
         }
         
+        # Теперь вызываем super()
         super().__init__(**kwargs)
+        
+        # Настраиваем layout
         self.orientation = 'vertical'
-        self.padding = 15
+        self.padding = 10
         self.spacing = 10
         
         self._build_ui()
     
     def _build_ui(self):
+        """Построение интерфейса"""
+        
         # Заголовок
         title = Label(
-            text="[size=28][b]🥗 Калькулятор рецептов[/b][/size]",
+            text="[size=24][b]Калькулятор рецептов[/b][/size]",
             markup=True,
-            size_hint_y=0.1
+            size_hint_y=0.08
         )
         self.add_widget(title)
         
         # Выбор рецепта
-        self.add_widget(Label(text="Выберите блюдо:", size_hint_y=0.05, font_size='16sp'))
+        self.add_widget(Label(text="Выберите блюдо:", size_hint_y=0.05))
         self.recipe_spinner = Spinner(
             text="Выберите рецепт",
             values=self.calculator.recipes,
-            size_hint_y=0.08,
-            font_size='16sp'
+            size_hint_y=0.08
         )
         self.add_widget(self.recipe_spinner)
         
-        # Кнопки управления
-        btn_layout = BoxLayout(orientation='horizontal', size_hint_y=0.1, spacing=10)
-        
+        # Кнопка расчёта
         self.calc_btn = Button(
-            text="✅ Рассчитать (стандартно)",
-            background_color=(0.2, 0.6, 0.8, 1),
-            font_size='14sp'
+            text="Рассчитать",
+            size_hint_y=0.08,
+            background_color=(0.2, 0.6, 0.8, 1)
         )
         self.calc_btn.bind(on_press=self._calculate)
-        btn_layout.add_widget(self.calc_btn)
+        self.add_widget(self.calc_btn)
         
-        self.edit_btn = Button(
-            text="✏️ Изменить ингредиенты",
-            background_color=(0.8, 0.6, 0.2, 1),
-            font_size='14sp'
-        )
-        self.edit_btn.bind(on_press=self._open_edit_popup)
-        btn_layout.add_widget(self.edit_btn)
-        
-        self.add_widget(btn_layout)
-        
-        # Область вывода результата
-        scroll = ScrollView(size_hint_y=0.4)
+        # Область вывода результата (ScrollView)
+        scroll = ScrollView(size_hint_y=0.5)
         self.result_label = Label(
             text="[i]Результат появится здесь...[/i]",
             markup=True,
             size_hint_y=None,
             halign='left',
-            valign='top',
-            font_size='14sp'
+            valign='top'
         )
-        self.result_label.bind(
-            width=lambda _, w: self.result_label.setter('text_size')(self.result_label, (w - 20, None)),
-            texture_size=lambda _, ts: self.result_label.setter('height')(self.result_label, ts[1])
-        )
+        self.result_label.bind(size=self.result_label.setter('text_size'))
         scroll.add_widget(self.result_label)
         self.add_widget(scroll)
         
-        # Разделитель
-        self.add_widget(Label(text="", size_hint_y=0.02))
-        
         # Кнопки экспорта
-        export_label = Label(text="[b]📁 Экспорт отчёта[/b]", markup=True, size_hint_y=0.05)
-        self.add_widget(export_label)
+        btn_layout = BoxLayout(orientation='horizontal', size_hint_y=0.08, spacing=10)
         
-        export_layout = BoxLayout(orientation='horizontal', size_hint_y=0.1, spacing=10)
-        
-        self.xls_btn = Button(text="📊 Excel (.xlsx)", font_size='13sp')
+        self.xls_btn = Button(text="📊 Сохранить в XLS")
         self.xls_btn.bind(on_press=self._export_xls)
-        export_layout.add_widget(self.xls_btn)
+        btn_layout.add_widget(self.xls_btn)
         
-        self.doc_btn = Button(text="📄 Word (.docx)", font_size='13sp')
+        self.doc_btn = Button(text="📄 Сохранить в DOC")
         self.doc_btn.bind(on_press=self._export_doc)
-        export_layout.add_widget(self.doc_btn)
+        btn_layout.add_widget(self.doc_btn)
         
-        self.add_widget(export_layout)
+        self.add_widget(btn_layout)
         
         # Кнопка сохранения в БД
         self.db_btn = Button(
             text="💾 Сохранить в базу данных",
             size_hint_y=0.08,
-            background_color=(0.3, 0.7, 0.3, 1),
-            font_size='14sp'
+            background_color=(0.3, 0.7, 0.3, 1)
         )
         self.db_btn.bind(on_press=self._save_to_db)
         self.add_widget(self.db_btn)
     
     def _calculate(self, instance):
+        """Обработчик расчёта"""
         recipe = self.recipe_spinner.text
         if recipe == "Выберите рецепт":
-            self._show_popup("Ошибка", "Выберите блюдо из списка")
+            self._show_popup("Ошибка", "Пожалуйста, выберите блюдо из списка")
             return
         
         try:
-            self.current_recipe = recipe
             self.current_result = self.calculator.calculate(recipe)
-            self._update_result_display()
-        except Exception as e:
-            self._show_popup("Ошибка расчёта", str(e))
-    
-    def _update_result_display(self):
-        if self.current_result:
             self.result_label.text = self.current_result.to_text()
             self.result_label.markup = True
-    
-    def _open_edit_popup(self, instance):
-        recipe = self.recipe_spinner.text
-        if recipe == "Выберите рецепт":
-            self._show_popup("Ошибка", "Сначала выберите рецепт")
-            return
-        
-        ingredients = self.calculator.get_recipe_ingredients(recipe)
-        if not ingredients:
-            self._show_popup("Ошибка", "Не удалось получить состав рецепта")
-            return
-        
-        self.current_recipe = recipe
-        popup = EditIngredientsPopup(recipe, ingredients, self._calculate_with_custom)
-        popup.open()
-    
-    def _calculate_with_custom(self, custom_weights: Dict[str, float]):
-        """Расчёт с изменёнными ингредиентами"""
-        try:
-            self.current_result = self.calculator.calculate(self.current_recipe, custom_weights)
-            self._update_result_display()
         except Exception as e:
             self._show_popup("Ошибка расчёта", str(e))
     
     def _export_xls(self, instance):
-        self._export('xls', "Excel files", "*.xlsx")
+        self._export('xls', "*.xlsx")
     
     def _export_doc(self, instance):
-        self._export('doc', "Word files", "*.docx")
+        self._export('doc', "*.docx")
     
-    def _export(self, format_type: str, file_desc: str, extension: str):
+    def _export(self, format_type: str, extension: str):
         if not self.current_result:
             self._show_popup("Нет данных", "Сначала выполните расчёт")
             return
         
+        # Создаём popup с выбором файла
         content = BoxLayout(orientation='vertical')
         filechooser = FileChooserListView()
         content.add_widget(filechooser)
         
-        btn_layout = BoxLayout(size_hint_y=0.15, spacing=10)
+        btn_layout = BoxLayout(size_hint_y=0.2, spacing=10)
         save_btn = Button(text="Сохранить")
         cancel_btn = Button(text="Отмена")
         btn_layout.add_widget(save_btn)
         btn_layout.add_widget(cancel_btn)
         content.add_widget(btn_layout)
         
-        popup = Popup(title="Сохранить отчёт", content=content, size_hint=(0.9, 0.8))
+        popup = Popup(title="Сохранить отчёт", content=content, size_hint=(0.9, 0.9))
         
         def on_save(instance):
             if filechooser.selection:
@@ -606,8 +490,6 @@ class RecipeAppLayout(BoxLayout):
                 except Exception as e:
                     popup.dismiss()
                     self._show_popup("Ошибка", f"Не удалось сохранить файл:\n{e}")
-            else:
-                self._show_popup("Ошибка", "Выберите папку для сохранения")
         
         save_btn.bind(on_press=on_save)
         cancel_btn.bind(on_press=lambda x: popup.dismiss())
@@ -622,12 +504,13 @@ class RecipeAppLayout(BoxLayout):
             self._show_popup("БД", "Результат сохранён в базу данных")
     
     def _show_popup(self, title: str, message: str):
-        content = BoxLayout(orientation='vertical', padding=10, spacing=10)
-        content.add_widget(Label(text=message, font_size='14sp'))
-        close_btn = Button(text="OK", size_hint_y=0.3, font_size='14sp')
+        """Показать всплывающее сообщение"""
+        content = BoxLayout(orientation='vertical')
+        content.add_widget(Label(text=message, markup=True))
+        close_btn = Button(text="OK", size_hint_y=0.3)
         content.add_widget(close_btn)
         
-        popup = Popup(title=title, content=content, size_hint=(0.6, 0.25))
+        popup = Popup(title=title, content=content, size_hint=(0.7, 0.3))
         close_btn.bind(on_press=popup.dismiss)
         popup.open()
     
@@ -639,6 +522,8 @@ class RecipeAppLayout(BoxLayout):
 
 
 class RecipeApp(App):
+    """Главный класс приложения Kivy"""
+    
     def __init__(self, calculator: RecipeCalculator, db_repo: SQLiteRepository, **kwargs):
         super().__init__(**kwargs)
         self.calculator = calculator
@@ -657,6 +542,7 @@ class RecipeApp(App):
 
 # ========== Инициализация данных ==========
 def create_default_ingredients() -> Dict[str, Ingredient]:
+    """Создание базы ингредиентов"""
     ingredients_data = {
         "куриное филе":    (23.0, 1.5, 0.0, 110, 45.0),
         "говядина":        (26.0, 15.0, 0.0, 250, 70.0),
@@ -677,6 +563,7 @@ def create_default_ingredients() -> Dict[str, Ingredient]:
 
 
 def create_default_recipes(calculator: RecipeCalculator):
+    """Добавление стандартных рецептов"""
     recipes = {
         "🍜 Вок": {"рис": 150, "куриное филе": 100, "помидор": 50, "огурец": 50, "кетчуп": 30},
         "🍔 Бургер": {"булочка": 60, "говядина": 120, "сыр": 30, "салат": 20, "помидор": 30, "кетчуп": 20},
@@ -689,11 +576,14 @@ def create_default_recipes(calculator: RecipeCalculator):
 
 # ========== ТОЧКА ВХОДА ==========
 if __name__ == "__main__":
+    # Создание ингредиентов и рецептов
     ingredients = create_default_ingredients()
     calculator = RecipeCalculator(ingredients)
     create_default_recipes(calculator)
     
+    # Инициализация БД (SQLite)
     db_repo = SQLiteRepository("recipes.db")
     
+    # Запуск Kivy приложения
     app = RecipeApp(calculator, db_repo)
     app.run()
